@@ -1,0 +1,26 @@
+
+.pgnInput {
+    margin-top: 50px;
+    min-height: 200px;
+    width: 90%;
+    border-radius: 5px;
+    background-color: #32302d;
+    border: #1f1e1b 3px solid;
+}
+
+.loaderContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 90%;
+}
+
+.loadButton {
+    background-color: #1f1e1b;
+    border: #32302d 2px solid;
+    border-radius: 5px;
+    color: white;
+    margin-top: 20px;
+    width: 30%;
+    min-height: 50px;
+}

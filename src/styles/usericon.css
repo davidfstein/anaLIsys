@@ -1,0 +1,26 @@
+.user-icon-container {
+    display: flex;
+}
+
+.user-icon-image {
+    background-color: purple;
+    border: 1px solid black;
+    margin-right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: 800;
+}
+
+.user-icon-username {
+    color: white;
+    font-weight: 800;
+    margin-right: 3px;
+    font-size: .9rem;
+}
+
+.user-icon-rating {
+    color: #959392;
+    font-size: .9rem;
+}

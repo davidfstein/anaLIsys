@@ -1,0 +1,10 @@
+.mainContainer {
+    padding-top: 30px;
+    background-color: inherit;
+    margin-right: 60px;
+  }
+
+.boardContainer {
+  display: flex;
+  justify-content: flex-start;
+}
