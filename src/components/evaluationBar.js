@@ -90,7 +90,7 @@ const EvaluationBar = ({ evaluation }) => {
                fontFamily='sans-serif'
                fill={entry.fill}
                textAnchor="middle"
-               verticalAnchor='end'>
+               >
                 {evaluation}
         </text>
     }
@@ -111,7 +111,7 @@ const EvaluationBar = ({ evaluation }) => {
                     <YAxis domain={[0, 16]} padding={{ bottom: 0, top: 0 }} tickLine={false}/>
                     <ReferenceLine y={0} stroke="#000" />
                     <Bar dataKey="value" fill="#ffffff" background={{ fill: '#403d39' }} label={{content: renderLabel, position: 'insideBottomLeft', 
-                                                                                                 fill: 'black', verticalAnchor: 'end'}}/>
+                                                                                                 fill: 'black', }}/>
                 </BarChart>
             </ResponsiveContainer>
 }
