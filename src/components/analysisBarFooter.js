@@ -13,7 +13,6 @@ const AnalysisBarFooter = () => {
     const whiteMoves = useSelector((state) => state.game.whiteMoves);
     const blackMoves = useSelector((state) => state.game.blackMoves);
     const engine = useSelector((state) => state.game.engine);
-    console.log(engine)
     const moves = zip(whiteMoves, blackMoves).flat(1); 
 
     const dispatch = useDispatch()
@@ -24,7 +23,7 @@ const AnalysisBarFooter = () => {
         }
         dispatch(goForward(moves[moveIndex]))
         engine.sendPosition(currentPosition);
-        engine.evaluatePosition();
+        engine.evaluatePosition(20);
         return false;
     }
 

@@ -1,12 +1,16 @@
 import Board from './components/board';
+import { Chess } from 'chess.js';
 import AnalysisBar from './components/analysisbar';
 import UserIcon from './components/usericon';
 import EvaluationBar from './components/evaluationBar';
+import AnalysisProgressModal from './components/analysisProgressModal';
+import { zip } from './utils/utils';
 import { setEngine } from './reducers/gameSlice';
 import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect} from 'react';
 import EngineController from './controllers/engineController';
+import { useState } from "react";
 
 function App() {
   const white = useSelector((state) => state.game.whitePlayer)
@@ -16,6 +20,12 @@ function App() {
   const whiteImageUrl = useSelector((state) => state.game.whiteImage)
   const blackImageUrl = useSelector((state) => state.game.blackImage)
   const opening = useSelector((state) => state.game.opening)
+  const whiteMoves = useSelector((state) => state.game.whiteMoves);
+  const blackMoves = useSelector((state) => state.game.blackMoves);
+  const [moves, setMoves] = useState([]);
+  const [engine, setAppEngine] = useState([]);
+  const [evals, setEvals] = useState([]);
+  const [loadingPercentage, setLoadingPercentage] = useState(100);
 
   const dispatch = useDispatch();
 
@@ -23,26 +33,73 @@ function App() {
     const stockfishWorker = new Worker('/stockfish.js', { type: 'module' });
 
     stockfishWorker.onmessage = (event) => {
-      console.log(event.data);
+      // console.log(event.data);
     };
 
     stockfishWorker.postMessage('uci');
-    stockfishWorker.onmessage = function (event) {
+    stockfishWorker.onmessage = (event) => {
       if (event.data.includes('uciok')) {
-        // Once the engine is ready, send the position and null move commands
+        // Once the engine is ready, send the position
         stockfishWorker.postMessage('position startpos');
+        stockfishWorker.postMessage('setoption Threads value 8');
+        stockfishWorker.postMessage('setoption Hash value 32');
       }
-      
       // Print the response from Stockfish
-      console.log(event.data);
+      // console.log(event.data);
     }
 
-    stockfishWorker.onerror = function(error) {
+    stockfishWorker.onerror = (error) => {
       console.error(error);
     };
 
-    dispatch(setEngine(new EngineController(stockfishWorker)));
+    const enginecontroller = new EngineController(stockfishWorker);
+    setAppEngine(enginecontroller)
+    dispatch(setEngine(enginecontroller));
+
+    return () => {
+      stockfishWorker.postMessage('quit');
+      stockfishWorker.terminate();
+    };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function evaluateMoves() { 
+      if (moves && engine) {
+        const analgame = new Chess();
+        const evals = [];
+        for (let i = 0; i < moves.length; i++) {
+          evals.push(await engine.evaluatePosition(20));
+          if (cancelled) {
+            return;
+          }
+          setLoadingPercentage(Math.ceil((i / (moves.length - 1)) * 100));
+          if (moves[i]) {
+            analgame.move(moves[i])
+            await engine.sendPosition(analgame.fen());
+          }
+        }
+        setEvals(evals)
+      }
+    }
+    evaluateMoves().catch(error => {
+      console.error(error);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [engine, moves]);
+
+  useEffect(() => {
+    setMoves(zip(whiteMoves, blackMoves).flat(1))
+  }, [whiteMoves, blackMoves])
+
+  const setLoadingIndicator = (percent) => {
+    const show = percent !== 100 
+    return <AnalysisProgressModal modal={show} percentage={percent} />
+  }
 
   return (  
       <div className="App container-fluid row">
@@ -56,6 +113,7 @@ function App() {
           <UserIcon username={black} rating={blackElo} imageURL={blackImageUrl} color='W' height="40px" width="40px"/>
         </div>
         <AnalysisBar opening={opening} /> 
+        {setLoadingIndicator(loadingPercentage)}
       </div>
   );
 }
