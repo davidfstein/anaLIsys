@@ -1,84 +1,40 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { useSelector } from 'react-redux';
 import '../styles/evalBar.css';
 
-const SAMPLE_CENTIPAWNS = [
-    0.3,
-    0.34,
-    0.36,
-    0.68,
-    0.28,
-    1.02,
-    0.37,
-    0.4,
-    -0.72,
-    -0.66,
-    -0.68,
-    -0.78,
-    -0.8,
-    -0.81,
-    -0.86,
-    -0.68,
-    -1.48,
-    -0.75,
-    -0.74,
-    -0.34,
-    -0.27,
-    -0.29,
-    -1.76,
-    -1.93,
-    -2.38,
-    -1.32,
-    -1.36,
-    -1.34,
-    -1.47,
-    -0.82,
-    -0.77,
-    0.3,
-    0.1,
-    0.04,
-    -0.18,
-    3.66,
-    3.59,
-    3.8,
-    3.81,
-    3.96,
-    3.3,
-    3.37,
-    3.28,
-    3.99,
-    3.93,
-    4.14,
-    3.32,
-    3.58,
-    1.18,
-    1.66,
-    1.03,
-    2.49,
-    1.5,
-    2.5,
-    2.55,
-    2.7,
-    2.71,
-    2.71,
-    2.81,
-    3.31,
-    -0.13,
-    -0.15,
-    -0.12,
-    0.0,
-    -0.03,
-    -0.07,
-    -0.1,
-    0.0,
-    -1.96,
-    2.88,
-    -9.94,
-    -11.75
-]
+const EvaluationBar = () => {
 
-const EvaluationBar = ({ evaluation }) => {
+    const evals = useSelector((state) => state.game.evals);
+    const currentMove = useSelector((state) => state.game.currentMove);
 
-    const chartData = [{x: 0, value: evaluation + 8}];
+    const DISPLAY_MIN = 0;
+    const DISPLAY_MAX = 16;
+    const DEFAULT = [{x: 0, value: 8}];
+    const evaluation = evals && currentMove ? evals[currentMove] : null;
+
+    const parseCP = (evaluation, white) => {
+        const cp_value = (evaluation.value / 100) * (white ? 1 : -1);
+        return {
+            value: cp_value + 8,
+            display: cp_value
+        }
+    } 
+
+    const parseMate = (evaluation, white) => {
+        return {
+            value: white ? DISPLAY_MAX : DISPLAY_MIN,
+            display: 'M' + evaluation.value
+        }
+    }
+
+    let white;
+    let parsedEval = {value: DEFAULT.value, display: 0};
+    let chartData = DEFAULT;
+    if (evaluation) {
+        white = currentMove % 2 === 0;
+        parsedEval = evaluation.type === 'cp' ? parseCP(evaluation, white) : parseMate(evaluation, white);
+        chartData = [{x: 0, value: parsedEval.value}];
+    }
 
     const renderLabel = (entry) => {
         return <text 
@@ -91,7 +47,7 @@ const EvaluationBar = ({ evaluation }) => {
                fill={entry.fill}
                textAnchor="middle"
                >
-                {evaluation}
+                {parsedEval.display}
         </text>
     }
 

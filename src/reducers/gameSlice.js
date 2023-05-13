@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Chess } from 'chess.js';
 import { INITIAL_FEN } from '../Constants';
+import EngineController from '../controllers/engineController';
 
 const initialState = {
   whiteMoves: [],
@@ -15,8 +16,9 @@ const initialState = {
   currentMove: 0,
   currentPosition: INITIAL_FEN,
   endPosition: '',
+  evals: [],
   game: new Chess(), 
-  engine: null
+  engine: new EngineController()
 }
 
 const gameSlice = createSlice({
@@ -76,6 +78,10 @@ const gameSlice = createSlice({
     setEngine(state, action) {
       state.engine = action.payload
     },
+    setEvalsState(state, action) {
+      console.log(action.payload)
+      state.evals = action.payload
+    },
     resetState(state, action) {
       state = initialState
     }
@@ -85,6 +91,6 @@ const gameSlice = createSlice({
 export const { addMove, clearMoves, setWhitePlayer, setBlackPlayer, setWhiteElo, setBlackElo, 
                setBlackImage, setWhiteImage, setOpening, setCurrentMove, setCurrentPosition,
                setEndPosition, setGame, resetState, goForward, undoMove, loadBeginning,
-               setEngine } = gameSlice.actions;
+               setEngine, setEvalsState } = gameSlice.actions;
 
 export default gameSlice.reducer;

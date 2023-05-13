@@ -29,6 +29,7 @@ const AnalysisBarFooter = () => {
 
     const sendGameState = (moveIndex) => {
         dispatch(setCurrentMove(moveIndex));
+        console.log(game.fen())
         dispatch(setCurrentPosition(game.fen()));
     }
 
