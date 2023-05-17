@@ -40,7 +40,7 @@ const EvaluationBar = () => {
         return <text 
                x={entry.x} 
                y={730} 
-               dx='23'
+               dx='15'
                dy={0}
                fontSize='11' 
                fontFamily='sans-serif'
@@ -53,12 +53,12 @@ const EvaluationBar = () => {
 
     return <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}
-                    width={35}
+                    width={30}
                     barCategoryGap={0}
                     barGap={0}
                     margin={{
                         top: 0,
-                        right: 35,
+                        right: 30,
                         left: 0,
                         bottom: 0,
                     }}

@@ -1,5 +1,7 @@
 import UserIconImage from './usericonimage';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 const AnalysisBarReviewSummary = (props) => {
 
@@ -8,6 +10,21 @@ const AnalysisBarReviewSummary = (props) => {
 
     return <div className='analysisBarReviewContainer'>
         <h2>Game Review</h2>
+        <div className='analysisBarMoveSummary'>
+            <table>
+                <tbody>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='brilliant'>Brilliant</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='great'>Great</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='best'>Best</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='excellent'>Excellent</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='good'>Good</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='book'>Book</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='inaccuracy'>Inaccuracy</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='mistake'>Mistake</td><td>0</td></tr>
+                    <tr><td><FontAwesomeIcon icon={faCircleXmark} /> 0</td><td className='blunder'>Blunder</td><td>0</td></tr>
+                </tbody>
+            </table>
+        </div>
         <div className='analysisBarResultContainer'>
             <div className='abaContainer d-flex align-items-center text-black bg-white border-success border'>
                 <UserIconImage imageURL={whiteImageUrl} color="W" height="60px" width="60px"/>

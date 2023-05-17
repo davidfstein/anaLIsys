@@ -39,7 +39,9 @@ function App() {
         const analgame = new Chess();
         for (let i = 0; i < moves.length; i++) {
           const start = Date.now();
-          let positionEval = await engine.evaluatePosition(15);
+          // let positionEval = await engine.evaluatePosition(10);
+          let positionEval = {'type': 'cp', 'value': Math.round(Math.random() * 100)}
+          positionEval.value = i % 2 === 0 ? positionEval.value : -positionEval.value;
           const end = Date.now();
           console.log(`Execution time: ${(end - start) / 1000} s`);
           evals.push(positionEval);

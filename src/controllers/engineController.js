@@ -2,12 +2,13 @@
 class EngineController {
 
     constructor() {
-        const stockfishWorker = new Worker('/stockfish.js', { type: 'module' });
+        const stockfishWorker = new Worker('stockfish.js', { type: 'module' });
         stockfishWorker.postMessage('uci');
         stockfishWorker.onmessage = (event) => {
             if (event.data.includes('uciok')) {
                 // Once the engine is ready, send the position
                 stockfishWorker.postMessage('setoption name UCI_AnalyseMode value true');
+                stockfishWorker.postMessage('setoption name MultiPV value 3');
                 stockfishWorker.postMessage('setoption name Use NNUE value false')
                 stockfishWorker.postMessage('position startpos');
                 stockfishWorker.postMessage('setoption name Threads value 8');

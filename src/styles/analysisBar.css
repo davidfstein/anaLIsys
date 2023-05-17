@@ -13,7 +13,7 @@
 }
 
 html .analysisBar {
-    margin-top: 20px;
+    margin-top: 30px;
     min-height: 400px;
     height: 95vh;
     min-width: 25vw;
@@ -171,7 +171,8 @@ html .analysisBar {
     flex-direction: column;
     align-items: center;
     color: white;
-    margin-top: 30px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .analysisBarReviewContainer h2 {
@@ -223,3 +224,30 @@ html .analysisBar {
     color: white;
     margin-top: auto;
 }
+
+.analysisBarMoveSummary { 
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.analysisBarMoveSummary td:nth-child(1) { 
+    padding-right: 20px;
+}
+
+.analysisBarMoveSummary td:nth-child(2) { 
+    text-align: center;
+}
+
+.analysisBarMoveSummary td:nth-child(3) { 
+    padding-left: 20px;
+}
+
+.brilliant{ color:blue }
+.great{ color: lightblue }
+.best{ color: aqua }
+.excellent{ color: darkgreen }
+.good{ color: lightseagreen }
+.book{ color: brown }
+.inaccuracy{ color: yellow }
+.mistake{ color: orange }
+.blunder{ color: red }
