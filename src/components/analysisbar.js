@@ -17,7 +17,7 @@ const AnalysisBar = (props) => {
                     <Link to='/' className='selected'><button id='gameload-button' onClick={handleClick}>Load Game</button></Link>
                 </div>
                 <Routes>
-                    <Route path="review" element={<AnalysisBarReview opening={props.opening}/>} />
+                    <Route path="review" element={<AnalysisBarReview opening={props.opening} />} />
                     <Route path="/" element={<GameLoader />} />
                 </Routes>
                 <AnalysisBarFooter />
