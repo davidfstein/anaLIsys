@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Chess } from 'chess.js';
 import { INITIAL_FEN } from '../Constants';
-import EngineController from '../controllers/engineController';
+import { zip } from '../utils/utils';
 
 const initialState = {
   whiteMoves: [],
   blackMoves: [],
+  moves: [],
   whitePlayer: '',
   blackPlayer: '',
   whiteRating: '',
@@ -18,7 +19,31 @@ const initialState = {
   endPosition: '',
   evals: [],
   game: new Chess(), 
-  engine: new EngineController()
+}
+
+const SET_MOVES = (state, action) => {
+  state.moves = action.payload;
+}
+
+const ADD_MOVE = (state, action) => {
+  if (action.payload.player === 'w') state.whiteMoves.push(action.payload.payload);
+  else state.blackMoves.push(action.payload.payload);
+  SET_MOVES(state, {'payload': zip(state.whiteMoves, state.blackMoves).flat(1)})
+}
+
+const GO_FORWARD = (state, action) => {
+  state.game.move(action.payload)
+  state.currentPosition = state.game.fen()
+}
+
+const UNDO_MOVE = (state, action) => {
+  state.game.undo()
+  state.currentPosition = state.game.fen()
+}
+
+const LOAD_BEGINNING = (state, action) => {
+  state.game.load(INITIAL_FEN)
+  state.currentPosition = state.game.fen()
 }
 
 const gameSlice = createSlice({
@@ -26,8 +51,7 @@ const gameSlice = createSlice({
   initialState,
   reducers: {
     addMove(state, action) {
-      if (action.payload.player === 'w') state.whiteMoves.push(action.payload.payload);
-      else state.blackMoves.push(action.payload.payload);
+      ADD_MOVE(state, action)
     },
     clearMoves(state, action) {
       state.whiteMoves = [];
@@ -57,9 +81,6 @@ const gameSlice = createSlice({
     setCurrentMove(state, action) {
       state.currentMove = action.payload
     },
-    setCurrentPosition(state, action) {
-      state.currentPosition = action.payload
-    },
     setEndPosition(state, action) {
       state.endPosition = action.payload
     },
@@ -67,13 +88,13 @@ const gameSlice = createSlice({
       state.game = action.payload
     },
     goForward(state, action) {
-      state.game.move(action.payload)
+      GO_FORWARD(state, action)
     },
     undoMove(state, action) {
-      state.game.undo()
+      UNDO_MOVE(state, action)
     },
     loadBeginning(state, action) {
-      state.game.load(INITIAL_FEN)
+      LOAD_BEGINNING(state, action)
     },
     setEngine(state, action) {
       state.engine = action.payload
@@ -89,7 +110,7 @@ const gameSlice = createSlice({
 })
 
 export const { addMove, clearMoves, setWhitePlayer, setBlackPlayer, setWhiteElo, setBlackElo, 
-               setBlackImage, setWhiteImage, setOpening, setCurrentMove, setCurrentPosition,
+               setBlackImage, setWhiteImage, setOpening, setCurrentMove,
                setEndPosition, setGame, resetState, goForward, undoMove, loadBeginning,
                setEngine, setEvalsState } = gameSlice.actions;
 

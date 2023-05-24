@@ -3,16 +3,14 @@ import { faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons
 import { zip } from '../utils/utils';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { setCurrentMove, setCurrentPosition, goForward, undoMove, loadBeginning } from '../reducers/gameSlice';
+import { setCurrentMove, goForward, undoMove, loadBeginning } from '../reducers/gameSlice';
 
 const AnalysisBarFooter = () => {
 
     const game = useSelector((state) => state.game.game);
     const currentMove = useSelector((state) => state.game.currentMove);
-    const currentPosition = useSelector((state) => state.game.currentPosition);
     const whiteMoves = useSelector((state) => state.game.whiteMoves);
     const blackMoves = useSelector((state) => state.game.blackMoves);
-    const engine = useSelector((state) => state.game.engine);
     const moves = zip(whiteMoves, blackMoves).flat(1); 
 
     const dispatch = useDispatch()
@@ -22,15 +20,11 @@ const AnalysisBarFooter = () => {
             return true;
         }
         dispatch(goForward(moves[moveIndex]))
-        engine.sendPosition(currentPosition);
-        engine.evaluatePosition(20);
         return false;
     }
 
     const sendGameState = (moveIndex) => {
         dispatch(setCurrentMove(moveIndex));
-        console.log(game.fen())
-        dispatch(setCurrentPosition(game.fen()));
     }
 
     const handleClick = (type) => {  
