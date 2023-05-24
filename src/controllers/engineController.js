@@ -1,51 +1,41 @@
-
+// Fix the multiple additions of listeners. Probably just add once at initialization 
 class EngineController {
 
-    constructor() {
-        const stockfishWorker = new Worker('stockfish.js', { type: 'module' });
-        stockfishWorker.postMessage('uci');
-        stockfishWorker.onmessage = (event) => {
-            if (event.data.includes('uciok')) {
-                // Once the engine is ready, send the position
-                stockfishWorker.postMessage('setoption name UCI_AnalyseMode value true');
-                stockfishWorker.postMessage('setoption name MultiPV value 3');
-                stockfishWorker.postMessage('setoption name Use NNUE value false')
-                stockfishWorker.postMessage('position startpos');
-                stockfishWorker.postMessage('setoption name Threads value 8');
-                stockfishWorker.postMessage('setoption name Clear Hash');
-                stockfishWorker.postMessage('setoption name Hash value 512');
-            }
+    constructor(stockfishWorker) {
+        if (stockfishWorker === null) {
+          throw new Error('Constructor cannot be called directly, use build')
         }
         this.engine = stockfishWorker;
     }
 
-    // static async build() {
-    //     const stockfishWorker = new Worker('/stockfish.js', { type: 'module' });
-    //     return new Promise((resolve) => {
-    //       const initializeEngine = () => {
-    //         stockfishWorker.postMessage('uci');
-    //       }
+    static async build() {
+        const stockfishWorker = await Stockfish();
+        return new Promise((resolve) => {
+          const initializeEngine = () => {
+            stockfishWorker.postMessage('ucinewgame');
+          }
 
-    //       const handleMessage = async (event) => {
-    //         const message = event.data;
-    //         if (message === 'uciok') {
-    //           stockfishWorker.postMessage('setoption name UCI_AnalyseMode value true');
-    //           await EngineController.waitForReady(stockfishWorker)
-    //           stockfishWorker.postMessage('position startpos');
-    //           await EngineController.waitForReady(stockfishWorker)
-    //           stockfishWorker.postMessage('setoption name Threads value 10');
-    //           await EngineController.waitForReady(stockfishWorker)
-    //           stockfishWorker.postMessage('setoption name Hash value 512');
-    //           await EngineController.waitForReady(stockfishWorker)
-    //         }
-    //         resolve(new EngineController(stockfishWorker));
-    //       }
+          const handleMessage = async (message) => {
+            if (message === 'uciok') {
+              stockfishWorker.postMessage('setoption name UCI_AnalyseMode value true');
+              await EngineController.waitForReady(stockfishWorker)
+              stockfishWorker.postMessage('setoption name Threads value 10');
+              await EngineController.waitForReady(stockfishWorker)
+              stockfishWorker.postMessage('setoption name Clear Hash');
+              await EngineController.waitForReady(stockfishWorker)
+              stockfishWorker.postMessage('setoption name Hash value 4096');
+              await EngineController.waitForReady(stockfishWorker)
+              stockfishWorker.postMessage('position startpos');
+              await EngineController.waitForReady(stockfishWorker)
+            }
+            resolve(new EngineController(stockfishWorker));
+          }
 
-    //       stockfishWorker.addEventListener("message", handleMessage);
+          stockfishWorker.addMessageListener(handleMessage);
 
-    //       initializeEngine();
-    //     })
-    // }
+          initializeEngine();
+        })
+    }
 
     static async waitForReady(engine) {
         return new Promise((resolve) => {
@@ -53,8 +43,7 @@ class EngineController {
             engine.postMessage("isready");
           };
     
-          const handleMessage = (event) => {
-            const message = event.data;
+          const handleMessage = (message) => {
             if (message === "readyok") {
               // Stockfish is ready
               resolve();
@@ -62,8 +51,8 @@ class EngineController {
           };
     
           // Listen for messages from Stockfish
-          engine.removeEventListener("message", handleMessage);
-          engine.addEventListener("message", handleMessage);
+          engine.removeMessageListener(handleMessage);
+          engine.addMessageListener(handleMessage);
     
           // Start checking if Stockfish is ready
           checkReady();
@@ -93,17 +82,16 @@ class EngineController {
               this.engine.postMessage(`go depth ${depth} movetime 0`);
             }
 
-            const handleMessage = (event) => {
-              const message = event.data;
+            const handleMessage = (message) => {
               if (message.startsWith(`info depth ${depth}`) && (message.includes(" cp ") || message.includes(" mate "))) {
                 this.engine.postMessage('stop')
-                this.engine.removeEventListener("message", handleMessage);
+                this.engine.removeMessageListener(handleMessage);
                 resolve(this.parseEvaluationMessage(message));
               }
             };
     
-            this.engine.removeEventListener("message", handleMessage);
-            this.engine.addEventListener("message", handleMessage);
+            this.engine.removeMessageListener(handleMessage);
+            this.engine.addMessageListener(handleMessage);
     
             goDepth();
           });

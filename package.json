@@ -29,6 +29,7 @@
     "redux": "^4.2.1",
     "redux-devtools-extension": "^2.13.9",
     "stockfish": "^15.0.0",
+    "stockfish-nnue.wasm": "^1.0.0-1946a675.smolnet",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
