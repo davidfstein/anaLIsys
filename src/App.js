@@ -3,6 +3,7 @@ import { Chess } from 'chess.js';
 import AnalysisBar from './components/analysisbar';
 import UserIcon from './components/usericon';
 import EvaluationBar from './components/evaluationBar';
+import EngineController from './controllers/engineController';
 import AnalysisProgressModal from './components/analysisProgressModal';
 import { zip } from './utils/utils';
 import { setEvalsState} from './reducers/gameSlice';
@@ -21,7 +22,6 @@ function App() {
   const opening = useSelector((state) => state.game.opening)
   const whiteMoves = useSelector((state) => state.game.whiteMoves);
   const blackMoves = useSelector((state) => state.game.blackMoves);
-  const engine = useSelector((state) => state.game.engine);
   const evals = [];
   const [moves, setMoves] = useState([]);
   const [loadingPercentage, setLoadingPercentage] = useState(100);
@@ -35,13 +35,15 @@ function App() {
   useEffect(() => {
 
     async function evaluateMoves() { 
+      const engine = await EngineController.build(); 
       if (moves && engine) {
         const analgame = new Chess();
         for (let i = 0; i < moves.length; i++) {
           const start = Date.now();
-          // let positionEval = await engine.evaluatePosition(10);
-          let positionEval = {'type': 'cp', 'value': Math.round(Math.random() * 100)}
-          positionEval.value = i % 2 === 0 ? positionEval.value : -positionEval.value;
+          console.log('evaluating')
+          let positionEval = await engine.evaluatePosition(20);
+          // let positionEval = {'type': 'cp', 'value': Math.round(Math.random() * 100)}
+          // positionEval.value = i % 2 === 0 ? positionEval.value : -positionEval.value;
           const end = Date.now();
           console.log(`Execution time: ${(end - start) / 1000} s`);
           evals.push(positionEval);
@@ -53,12 +55,13 @@ function App() {
         }
         dispatch(setEvalsState(evals))
       }
+      engine.cleanup()
     }
     
     evaluateMoves().catch(error => {
       console.error(error);
     });
-  }, [engine, moves]);
+  }, [moves]);
 
   const setLoadingIndicator = (percent) => {
     const show = percent !== 100 
