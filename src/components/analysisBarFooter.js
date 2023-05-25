@@ -3,7 +3,7 @@ import { faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons
 import { zip } from '../utils/utils';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { setCurrentMove, goForward, undoMove, loadBeginning } from '../reducers/gameSlice';
+import { setCurrentMove } from '../reducers/gameSlice';
 
 const AnalysisBarFooter = () => {
 
@@ -15,14 +15,6 @@ const AnalysisBarFooter = () => {
 
     const dispatch = useDispatch()
 
-    const forward = (moveIndex) => {
-        if (moveIndex === moves.length - 1) {
-            return true;
-        }
-        dispatch(goForward(moves[moveIndex]))
-        return false;
-    }
-
     const sendGameState = (moveIndex) => {
         dispatch(setCurrentMove(moveIndex));
     }
@@ -31,7 +23,6 @@ const AnalysisBarFooter = () => {
         let isEnd = currentMove === moves.length - 1; 
         switch (type) {
             case 'forward':
-                isEnd = forward(currentMove);
                 if (isEnd) {
                     break;
                 }
@@ -39,8 +30,7 @@ const AnalysisBarFooter = () => {
                 break;
             case 'end':
                 for (let x = currentMove; x < moves.length; x++) {
-                    isEnd = forward(x);
-                    if (isEnd) {
+                    if (x === moves.length - 1) {
                         break;
                     }
                 }
@@ -50,14 +40,12 @@ const AnalysisBarFooter = () => {
                 if (currentMove === 0) {
                     break;
                 }
-                dispatch(undoMove());
                 sendGameState(currentMove - 1);
                 break;
             case 'beginning':
                 if (currentMove === 0) {
                     break;
                 }
-                dispatch(loadBeginning());
                 sendGameState(0);
                 break;
             default:

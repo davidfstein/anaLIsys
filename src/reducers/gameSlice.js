@@ -46,6 +46,22 @@ const LOAD_BEGINNING = (state, action) => {
   state.currentPosition = state.game.fen()
 }
 
+const SET_CURRENT_MOVE = (state, action) => {
+  const currentMove = state.currentMove;
+  if (action.payload === 0) {
+    LOAD_BEGINNING(state, action);
+  } else if (action.payload < currentMove) {
+    for (let i = currentMove; i > action.payload; i--) {
+      UNDO_MOVE(state, action)
+    } 
+  } else if (action.payload > currentMove) {
+    for (let i = currentMove; i < action.payload; i++) {
+      GO_FORWARD(state, {'payload': state.moves[i]})
+    } 
+  }
+  state.currentMove = action.payload
+}
+
 const gameSlice = createSlice({
   name: 'game',
   initialState,
@@ -79,7 +95,7 @@ const gameSlice = createSlice({
       state.opening = action.payload
     },
     setCurrentMove(state, action) {
-      state.currentMove = action.payload
+      SET_CURRENT_MOVE(state, action)
     },
     setEndPosition(state, action) {
       state.endPosition = action.payload
