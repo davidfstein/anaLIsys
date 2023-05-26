@@ -10,7 +10,7 @@ const CentipawnPlot = () => {
     const DISPLAY_MIN = -8;
 
     const parseCP = (evaluation, white) => {
-      const cp_value = (evaluation.value / 100) * (white ? 1 : -1);
+      const cp_value = (evaluation.value / 100) * (!white ? 1 : -1);
       return {
         value: cp_value,
         display: cp_value
@@ -19,7 +19,7 @@ const CentipawnPlot = () => {
 
     const parseMate = (evaluation, white) => {
       return {
-        value: white ? DISPLAY_MAX : DISPLAY_MIN,
+        value: !white ? DISPLAY_MAX : DISPLAY_MIN,
         display: 'M' + evaluation.value
       }
     }

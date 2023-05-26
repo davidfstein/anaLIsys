@@ -13,7 +13,7 @@ const EvaluationBar = () => {
     const evaluation = evals && currentMove ? evals[currentMove] : null;
 
     const parseCP = (evaluation, white) => {
-        const cp_value = (evaluation.value / 100) * (white ? 1 : -1);
+        const cp_value = (evaluation.value / 100) * (!white ? 1 : -1);
         return {
             value: cp_value + 8,
             display: cp_value
@@ -22,7 +22,7 @@ const EvaluationBar = () => {
 
     const parseMate = (evaluation, white) => {
         return {
-            value: white ? DISPLAY_MAX : DISPLAY_MIN,
+            value: !white ? DISPLAY_MAX : DISPLAY_MIN,
             display: 'M' + evaluation.value
         }
     }

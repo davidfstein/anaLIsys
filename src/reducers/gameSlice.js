@@ -14,7 +14,7 @@ const initialState = {
   blackImage: '',
   whiteImage: '',
   opening: '',
-  currentMove: 0,
+  currentMove: -1,
   currentPosition: INITIAL_FEN,
   endPosition: '',
   evals: [],
@@ -48,7 +48,7 @@ const LOAD_BEGINNING = (state, action) => {
 
 const SET_CURRENT_MOVE = (state, action) => {
   const currentMove = state.currentMove;
-  if (action.payload === 0) {
+  if (action.payload === -1) {
     LOAD_BEGINNING(state, action);
   } else if (action.payload < currentMove) {
     for (let i = currentMove; i > action.payload; i--) {
@@ -56,7 +56,7 @@ const SET_CURRENT_MOVE = (state, action) => {
     } 
   } else if (action.payload > currentMove) {
     for (let i = currentMove; i < action.payload; i++) {
-      GO_FORWARD(state, {'payload': state.moves[i]})
+      GO_FORWARD(state, {'payload': state.moves[i + 1]})
     } 
   }
   state.currentMove = action.payload

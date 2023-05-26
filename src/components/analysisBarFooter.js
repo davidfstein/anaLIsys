@@ -37,16 +37,16 @@ const AnalysisBarFooter = () => {
                 sendGameState(moves.length - 1);
                 break;
             case 'back':
-                if (currentMove === 0) {
+                if (currentMove === -1) {
                     break;
                 }
                 sendGameState(currentMove - 1);
                 break;
             case 'beginning':
-                if (currentMove === 0) {
+                if (currentMove === -1) {
                     break;
                 }
-                sendGameState(0);
+                sendGameState(-1);
                 break;
             default:
                 console.log(type)

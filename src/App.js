@@ -39,8 +39,11 @@ function App() {
       if (moves && engine) {
         const analgame = new Chess();
         for (let i = 0; i < moves.length; i++) {
+          if (moves[i]) {
+            analgame.move(moves[i])
+            await engine.sendPosition(analgame.fen());
+          }
           const start = Date.now();
-          console.log('evaluating')
           let positionEval = await engine.evaluatePosition(20);
           // let positionEval = {'type': 'cp', 'value': Math.round(Math.random() * 100)}
           // positionEval.value = i % 2 === 0 ? positionEval.value : -positionEval.value;
@@ -48,10 +51,6 @@ function App() {
           console.log(`Execution time: ${(end - start) / 1000} s`);
           evals.push(positionEval);
           setLoadingPercentage(Math.ceil((i / (moves.length - 1)) * 100));
-          if (moves[i]) {
-            analgame.move(moves[i])
-            await engine.sendPosition(analgame.fen());
-          }
         }
         dispatch(setEvalsState(evals))
       }
