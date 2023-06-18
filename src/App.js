@@ -6,6 +6,8 @@ import EvaluationBar from './components/evaluationBar';
 import EngineController from './controllers/engineController';
 import AnalysisProgressModal from './components/analysisProgressModal';
 import { zip } from './utils/utils';
+import { Evaluation } from './utils/Evaluation';
+import { summarizeMoves } from './utils/gameReview';
 import { setEvalsState} from './reducers/gameSlice';
 import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
@@ -22,7 +24,6 @@ function App() {
   const opening = useSelector((state) => state.game.opening)
   const whiteMoves = useSelector((state) => state.game.whiteMoves);
   const blackMoves = useSelector((state) => state.game.blackMoves);
-  const evals = [];
   const [moves, setMoves] = useState([]);
   const [loadingPercentage, setLoadingPercentage] = useState(100);
 
@@ -35,32 +36,52 @@ function App() {
   useEffect(() => {
 
     async function evaluateMoves() { 
-      const engine = await EngineController.build(); 
-      if (moves && engine) {
+      const engine = await EngineController.build();
+      let evals = [];
+      if (moves.length !== 0 && engine) {
+        setLoadingPercentage(0);
+        
+        let fens = [];
         const analgame = new Chess();
         for (let i = 0; i < moves.length; i++) {
           if (moves[i]) {
             analgame.move(moves[i])
-            await engine.sendPosition(analgame.fen());
+            fens.push(analgame.fen())
           }
+        }
+        fens = fens.reverse()
+  
+        for (let i = 0; i < fens.length; i++) {
+          await engine.sendPosition(fens[i]);
           const start = Date.now();
-          let positionEval = await engine.evaluatePosition(20);
+          let positionEval = await engine.evaluatePosition(15);
           // let positionEval = {'type': 'cp', 'value': Math.round(Math.random() * 100)}
           // positionEval.value = i % 2 === 0 ? positionEval.value : -positionEval.value;
           const end = Date.now();
           console.log(`Execution time: ${(end - start) / 1000} s`);
           evals.push(positionEval);
-          setLoadingPercentage(Math.ceil((i / (moves.length - 1)) * 100));
+          setLoadingPercentage(Math.ceil((i / (fens.length - 1)) * 100));
         }
+
+        evals = evals.reverse();
+        const evaluation = new Evaluation(evals);
+        const [whiteCPLs, blackCPLs] = evaluation.getCPLs();
+        
+        console.log('White CPLs:', whiteCPLs)
+        console.log('Black CPLs:', blackCPLs)
+        console.log('Mean white CPL:', whiteCPLs.reduce((p,a) => p + a, 0) / whiteCPLs.length)
+        console.log('Mean black CPL:', blackCPLs.reduce((p,a) => p + a, 0) / blackCPLs.length)
+
+        console.log('Accuracy:', evaluation.getGameAccuracy())
+        console.log('Move summary:', summarizeMoves(evals.map(e => e.value)))
+        console.log('Evals:', evals);
         dispatch(setEvalsState(evals))
-      }
+      }  
       engine.cleanup()
     }
     
-    evaluateMoves().catch(error => {
-      console.error(error);
-    });
-  }, [moves]);
+    evaluateMoves();
+  }, [moves, dispatch]);
 
   const setLoadingIndicator = (percent) => {
     const show = percent !== 100 

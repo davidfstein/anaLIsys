@@ -116,7 +116,6 @@ const gameSlice = createSlice({
       state.engine = action.payload
     },
     setEvalsState(state, action) {
-      console.log(action.payload)
       state.evals = action.payload
     },
     resetState(state, action) {

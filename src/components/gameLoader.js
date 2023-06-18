@@ -26,7 +26,6 @@ const GameLoader = () => {
         dispatch(setOpening(game.tags.ECO));
         dispatch(setEndPosition(game.tags.CurrentPosition));
         game.moves.forEach(move => dispatch(addMove({payload: move.notation.notation, player: move.turn})));
-        console.log(game)
         navigate('/review')
     }
 
