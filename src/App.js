@@ -7,7 +7,7 @@ import EngineController from './controllers/engineController';
 import AnalysisProgressModal from './components/analysisProgressModal';
 import { zip } from './utils/utils';
 import { Evaluation } from './utils/Evaluation';
-import { summarizeMoves } from './utils/gameReview';
+import { GameReview } from './utils/GameReview';
 import { setEvalsState} from './reducers/gameSlice';
 import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
@@ -54,7 +54,7 @@ function App() {
         for (let i = 0; i < fens.length; i++) {
           await engine.sendPosition(fens[i]);
           const start = Date.now();
-          let positionEval = await engine.evaluatePosition(15);
+          let positionEval = await engine.evaluatePosition(20);
           // let positionEval = {'type': 'cp', 'value': Math.round(Math.random() * 100)}
           // positionEval.value = i % 2 === 0 ? positionEval.value : -positionEval.value;
           const end = Date.now();
@@ -71,10 +71,43 @@ function App() {
         console.log('Black CPLs:', blackCPLs)
         console.log('Mean white CPL:', whiteCPLs.reduce((p,a) => p + a, 0) / whiteCPLs.length)
         console.log('Mean black CPL:', blackCPLs.reduce((p,a) => p + a, 0) / blackCPLs.length)
-
         console.log('Accuracy:', evaluation.getGameAccuracy())
-        console.log('Move summary:', summarizeMoves(evals.map(e => e.value)))
         console.log('Evals:', evals);
+
+        const bestMoves = new Array(moves.length).fill(0);
+        const whiteReview = new GameReview(whiteCPLs, 
+                                           moves.filter((move, i) => (i % 2 === 0)), 
+                                           bestMoves.filter((move, i) => (i % 2 === 0))); 
+        const whiteInaccuracies = whiteReview.innaccuracyCount();
+        const whiteMistakes = whiteReview.mistakeCount();
+        const whiteBlunders = whiteReview.blunderCount();
+        const whiteGoods = whiteReview.goodCount();
+        const whiteExcellents = whiteReview.excellentCount();
+        const whiteBests = whiteReview.bestCount();
+
+        const blackReview = new GameReview(blackCPLs, 
+                                           moves.filter((move, i) => (i % 2 !== 0)), 
+                                           bestMoves.filter((move, i) => (i % 2 !== 0))) 
+        const blackInaccuracies = blackReview.innaccuracyCount();
+        const blackMistakes = blackReview.mistakeCount();
+        const blackBlunders = blackReview.blunderCount();
+        const blackGoods = blackReview.goodCount();
+        const blackExcellents = blackReview.excellentCount();
+        const blackBests = blackReview.bestCount();
+
+        console.log('White Inaccuracies:', whiteInaccuracies);
+        console.log('White Mistakes:', whiteMistakes);
+        console.log('White Blunders:', whiteBlunders);
+        console.log('White Goods:', whiteGoods);
+        console.log('White Excellents:', whiteExcellents);
+        console.log('White Bests:', whiteBests);
+        console.log('black Inaccuracies:', blackInaccuracies);
+        console.log('black Mistakes:', blackMistakes);
+        console.log('black Blunders:', blackBlunders);
+        console.log('black Goods:', blackGoods);
+        console.log('black Excellents:', blackExcellents);
+        console.log('black Bests:', blackBests);
+        
         dispatch(setEvalsState(evals))
       }  
       engine.cleanup()
